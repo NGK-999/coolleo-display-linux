@@ -1,0 +1,4 @@
+# Managed by coolleo-display-linux
+# Interface 01 contains Report 7 and auxiliary HID reports. The daemon performs
+# a second, exact descriptor check on the same open fd before every USB write.
+ACTION=="add|change", SUBSYSTEM=="hidraw", KERNEL=="hidraw*", DEVPATH=="*/usb*/*:1.1/0003:1A2C:4D84.*/hidraw/hidraw*", MODE="0660", GROUP="coolleo-display"

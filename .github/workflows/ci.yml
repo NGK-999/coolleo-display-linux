@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Compile
+        run: python -m py_compile src/coolleo_display.py tests/test_coolleo_display.py
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: CLI smoke tests
+        run: |
+          python src/coolleo_display.py --version
+          python src/coolleo_display.py --help
+
+  linux-packaging:
+    name: Linux packaging
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Shell syntax
+        run: bash -n scripts/install.sh scripts/uninstall.sh
+      - name: ShellCheck
+        run: shellcheck scripts/install.sh scripts/uninstall.sh
+      - name: Prepare service identity and executable
+        run: |
+          sudo groupadd --system coolleo-display
+          sudo useradd --system --gid coolleo-display --home-dir /nonexistent --no-create-home --shell /usr/sbin/nologin coolleo-display
+          sudo install -o root -g root -m 0755 src/coolleo_display.py /usr/local/bin/coolleo-display
+      - name: Validate systemd unit
+        run: systemd-analyze verify packaging/coolleo-display.service
+      - name: Validate udev rule when supported
+        run: |
+          if udevadm --help 2>&1 | grep -qE '(^|[[:space:]])verify([[:space:]]|$)'; then
+            udevadm verify packaging/70-coolleo-display.rules
+          else
+            echo "udevadm verify is unavailable on this runner"
+          fi
+      - name: Reject trailing whitespace
+        run: |
+          if git grep -nI -E '[[:blank:]]+$' -- .; then
+            echo "Trailing whitespace found" >&2
+            exit 1
+          fi

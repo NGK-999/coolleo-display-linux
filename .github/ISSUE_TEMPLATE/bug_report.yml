@@ -1,0 +1,108 @@
+name: Bug report
+description: Report a reproducible problem on hardware listed as compatible.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This project is experimental. Remove hostnames, usernames, IP addresses, serial numbers, tokens, passwords, and unrelated logs before submitting.
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety checklist
+      options:
+        - label: I own this device or have permission to test it.
+          required: true
+        - label: I did not run guessed feature reports, firmware commands, or attach vendor binaries.
+          required: true
+        - label: I redacted private and identifying information.
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: Project version
+      placeholder: 0.1.0-alpha.1
+    validations:
+      required: true
+  - type: input
+    id: cooler
+    attributes:
+      label: Cooler label and model
+      description: Copy the public model label, but do not include serial numbers.
+    validations:
+      required: true
+  - type: input
+    id: cpu
+    attributes:
+      label: CPU model
+      placeholder: Intel Core i9-11900KF
+    validations:
+      required: true
+  - type: input
+    id: usb
+    attributes:
+      label: USB VID:PID
+      description: This alpha expects 1a2c:4d84. Do not include a serial number.
+      placeholder: 1a2c:4d84
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Linux distribution and kernel
+      placeholder: Ubuntu Server 24.04; Linux 6.8.x x86_64
+    validations:
+      required: true
+  - type: dropdown
+    id: check
+    attributes:
+      label: Did the read-only `--check` pass?
+      options:
+        - "Yes"
+        - "No"
+        - "Not run"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: List exact commands and actions in order.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+      description: Include physical display values when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: visual
+    attributes:
+      label: Controlled visual comparison
+      description: Include `display_temperature`, `display_power`, and the two whole numbers physically shown, or state why this test was not run.
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostic output
+      description: Use only the safe diagnostic commands from docs/SUPPORT.md.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: changes
+    attributes:
+      label: Local changes
+      description: State whether installed files or service settings were edited after installation.
+    validations:
+      required: true

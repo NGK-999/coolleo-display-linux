@@ -1,0 +1,38 @@
+# Managed by coolleo-display-linux
+[Unit]
+Description=COOLLEO-compatible CPU telemetry display
+Documentation=https://github.com/NGK-999/coolleo-display-linux
+After=local-fs.target systemd-udevd.service systemd-modules-load.service
+StartLimitIntervalSec=5min
+StartLimitBurst=6
+
+[Service]
+Type=simple
+User=coolleo-display
+Group=coolleo-display
+ExecStartPre=+/usr/local/bin/coolleo-display --prepare-access
+ExecStart=/usr/local/bin/coolleo-display --interval 2 --retry-interval 10
+ExecStopPost=+/usr/local/bin/coolleo-display --restore-access
+Restart=on-failure
+RestartSec=10s
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+PrivateTmp=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+SystemCallArchitectures=native
+UMask=0077
+InaccessiblePaths=-/dev/input
+
+[Install]
+WantedBy=multi-user.target
